@@ -1,8 +1,8 @@
 package org.buzas.lesson1.question2;
 
-class LightWeightCar extends Car implements Moveable{
+public class LightWeightCar extends Car implements Moveable{
     @Override
-    void open() {
+    public void open() {
         System.out.println("Car is open");
     }
 
