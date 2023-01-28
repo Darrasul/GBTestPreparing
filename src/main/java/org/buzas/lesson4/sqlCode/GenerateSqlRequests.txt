@@ -1,0 +1,102 @@
+Структура столов:
+1. films - id, name(строка), duration(время)
+2. tickets_types - id, type(строка), cost(число)
+3. schedule - id_session, films.id, start_time(время начала), tickets_types.id
+4. tickets - id, schedule.id_session, seat(число, это значение проверяется на
+стороне Java-кода, т.к. если мы делаем значение уникальным, то его не могут
+занять и на более поздних сеансах. Как задать уникальность в БД в такой
+ситуации- не придумал),  sold(bool, продан по умолчанию,
+на случай, если билет вернут)
+
+Создание схемы со столами
+
+CREATE SCHEMA `GB_testPrep` ;
+
+1.
+CREATE TABLE `GB_testPrep`.`films` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `duration` TIME NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE);
+
+2.
+CREATE TABLE `GB_testPrep`.`tickets_type` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `type` VARCHAR(45) NOT NULL,
+  `cost` DOUBLE NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
+  UNIQUE INDEX `type_UNIQUE` (`type` ASC) VISIBLE);
+
+3. (Не умею грамотно использовать скрипты, но, по сути,
+ тут еще finish_time добавить можно, если как раз с ними повозиться)
+CREATE TABLE `GB_testPrep`.`schedule` (
+  `id_session` INT NOT NULL AUTO_INCREMENT,
+  `id_film` INT NOT NULL,
+  `start_time` TIME NOT NULL,
+  PRIMARY KEY (`id_session`),
+  UNIQUE INDEX `id_session_UNIQUE` (`id_session` ASC) VISIBLE,
+  INDEX `film_id_idx` (`id_film` ASC) VISIBLE,
+  CONSTRAINT `film_id`
+    FOREIGN KEY (`id_film`)
+    REFERENCES `GB_testPrep`.`films` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+ Забыл поле:
+ALTER TABLE `GB_testPrep`.`schedule`
+ADD COLUMN `tickets_type` INT NOT NULL AFTER `start_time`,
+ADD INDEX `type_idx` (`tickets_type` ASC) VISIBLE;
+;
+ALTER TABLE `GB_testPrep`.`schedule`
+ADD CONSTRAINT `type`
+  FOREIGN KEY (`tickets_type`)
+  REFERENCES `GB_testPrep`.`tickets_type` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+4.
+CREATE TABLE `GB_testPrep`.`tickets` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `session` INT NOT NULL,
+  `seat` INT NOT NULL,
+  `sold` TINYINT NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
+  INDEX `session_id_idx` (`session` ASC) VISIBLE,
+  CONSTRAINT `session_id`
+    FOREIGN KEY (`session`)
+    REFERENCES `GB_testPrep`.`schedule` (`id_session`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+Заполнение таблиц
+1. (Скрин итогового результата screens/films_screen.png)
+INSERT INTO GB_testPrep.films (name, duration) VALUES ('film#1', '01:30:00');
+INSERT INTO GB_testPrep.films (name, duration) VALUES ('film#2', '02:00:00');
+INSERT INTO GB_testPrep.films (name, duration) VALUES ('film#3', '01:00:00');
+INSERT INTO GB_testPrep.films (name, duration) VALUES ('film#4', '01:00:00');
+INSERT INTO GB_testPrep.films (name, duration) VALUES ('film#5', '01:30:00');
+
+2. (Скрин итогового результата screens/tickets_type_screen.png)
+INSERT INTO GB_testPrep.tickets_type (type, cost) VALUES ('night', 150);
+INSERT INTO GB_testPrep.tickets_type (type, cost) VALUES ('morning', 100);
+INSERT INTO GB_testPrep.tickets_type (type, cost) VALUES ('day', 250);
+INSERT INTO GB_testPrep.tickets_type (type, cost) VALUES ('evening', 500);
+
+3. (Скрин итогового результата screens/schedule_screen.png)
+INSERT INTO GB_testPrep.schedule (id_film, start_time, tickets_type) VALUES (1, '01:00:00', 1);
+INSERT INTO GB_testPrep.schedule (id_film, start_time, tickets_type) VALUES (2, '02:30:00', 1);
+// Перерыв №1(12 часов)
+INSERT INTO GB_testPrep.schedule (id_film, start_time, tickets_type) VALUES (3, '16:30:00', 3);
+// Наложение на 30 минут
+INSERT INTO GB_testPrep.schedule (id_film, start_time, tickets_type) VALUES (4, '17:00:00', 3);
+// Перерыв №2(1 час)
+INSERT INTO GB_testPrep.schedule (id_film, start_time, tickets_type) VALUES (5, '19:00:00', 4);
+
+4. (Скрин итогового результата screens/tickets_screen.png)
+INSERT INTO GB_testPrep.tickets (session, seat, sold) VALUES (1, 11, DEFAULT);
+INSERT INTO GB_testPrep.tickets (session, seat, sold) VALUES (3, 11, DEFAULT);
+INSERT INTO GB_testPrep.tickets (session, seat, sold) VALUES (5, 25, DEFAULT);
