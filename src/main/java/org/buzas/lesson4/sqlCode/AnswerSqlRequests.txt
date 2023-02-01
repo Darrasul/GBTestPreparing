@@ -1,0 +1,25 @@
+1. (Скрин итогового результата screens/Answer1.png)
+SELECT f1.name, s1.start_time, f1.duration, f2.name, s2.start_time, f2.duration
+FROM films f1
+JOIN schedule s1 on f1.id = s1.id_film
+INNER JOIN films f2 on f1.id = f2.id - 1
+JOIN schedule s2 on f2.id = s2.id_film
+WHERE (f1.duration + s1.start_time) > (s2.start_time + 0)
+ORDER BY s1.start_time
+
+Прикола ради сначала попытался чисто на Java-коде что-то состряпать. Получилась довольно монструозная конструкция,
+в которой еще iter внутри iter, что не есть хорошо, но оставил. Честно сказать я на это-то правильно ответил запоздало, уже думал то,
+как основное решение сдавать, т.к. сначала как-то даже не дошло, как можно сравнить две таблицы(не знаю, как остальная группа, но у меня за время
+программы просто не сложилось такой необходимости)
+
+2. (Скрин итогового результата screens/Answer2.png и Answer2withAddition.png)
+SELECT f1.name, s1.start_time, f1.duration, s2.start_time, f2.duration
+FROM films f1
+JOIN schedule s1 on f1.id = s1.id_film
+INNER JOIN films f2 on f1.id = f2.id - 1
+JOIN schedule s2 on f2.id = s2.id_film
+WHERE ((f1.duration + s1.start_time) - s2.start_time) <= -3000
+ORDER BY ((f1.duration + s1.start_time) - s2.start_time) DESC
+
+Убрал строчку, через которую проверил верность данных: (s1.start_time + f1.duration - s2.start_time) as "HH:MM:SS", - оно было в строчки SELECT, показано на
+скриншоте
