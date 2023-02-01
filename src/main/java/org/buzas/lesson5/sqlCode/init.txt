@@ -1,0 +1,8 @@
+Я прописал таблицу согласно п.1 из ДЗ, но также прописал грамотно connection.url в cfg файле, чтобы в случае, если таблица не существует, ее создавало
+CREATE SCHEMA `lesson5` ;
+CREATE TABLE `lesson5`.`students` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `mark` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);
