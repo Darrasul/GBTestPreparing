@@ -8,7 +8,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/lesson7/pom.xml" />
+        <option value="$PROJECT_DIR$/src/main/java/org/buzas/lesson7/pom.xml" />
       </list>
     </option>
   </component>
